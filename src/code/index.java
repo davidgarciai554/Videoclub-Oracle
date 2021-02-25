@@ -15,6 +15,8 @@ import javax.swing.table.DefaultTableModel;
 public class index extends javax.swing.JFrame {
 
     BBDD_manager manager = new BBDD_manager();
+    String tableState = "empty";
+    int platforms = 0;
 
     /**
      * Creates new form index
@@ -173,6 +175,11 @@ public class index extends javax.swing.JFrame {
         setMinimumSize(new java.awt.Dimension(850, 525));
         setPreferredSize(new java.awt.Dimension(850, 525));
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         connect.setText("Conectar");
@@ -225,6 +232,16 @@ public class index extends javax.swing.JFrame {
 
             }
         ));
+        mainTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                mainTableMouseClicked(evt);
+            }
+        });
+        mainTable.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                mainTableKeyPressed(evt);
+            }
+        });
         jScrollPane1.setViewportView(mainTable);
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 13, -1, 460));
@@ -309,6 +326,8 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void findByPlatformActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findByPlatformActionPerformed
+        platforms = platforma_comboBox_1.getSelectedIndex();
+        tableState = "platforms";
         DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
         model.getDataVector().removeAllElements();
         model.setColumnCount(4);
@@ -325,33 +344,36 @@ public class index extends javax.swing.JFrame {
 
     private void accept_addPlatformActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accept_addPlatformActionPerformed
         if (manager.addSeries(id_addSerie.getText(), name_addSerie.getText(), director_addSerie.getText(), String.valueOf(platforma_comboBox_2.getSelectedItem()), date_addSerie.getText())) {
+            update();
             id_addSerie.setText("");
             name_addSerie.setText("");
             director_addSerie.setText("");
             date_addSerie.setText("");
             platforma_comboBox_2.setSelectedIndex(0);
             addSerie_frame.setVisible(false);
-            update();
+
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo añadir la serie revise la fecha", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_accept_addPlatformActionPerformed
 
     private void accept_addMovieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accept_addMovieActionPerformed
-        if (manager.addMovie(id_addMovie.getText(), name_addMovie.getText(), director_addMovie.getText(), String.valueOf(platforma_comboBox_2.getSelectedItem()), date_addMovie.getText())){
+        if (manager.addMovie(id_addMovie.getText(), name_addMovie.getText(), director_addMovie.getText(), String.valueOf(platforma_comboBox_2.getSelectedItem()), date_addMovie.getText())) {
+            update();
             id_addMovie.setText("");
             name_addMovie.setText("");
             director_addMovie.setText("");
             date_addMovie.setText("");
             platforma_comboBox_3.setSelectedIndex(0);
             addMovie_frame.setVisible(false);
-            update();
+
         } else {
             JOptionPane.showMessageDialog(null, "No se pudo añadir la serie revise la fecha", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_accept_addMovieActionPerformed
 
     private void showSeries_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showSeries_buttonActionPerformed
+        tableState = "series";
         DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
         model.getDataVector().removeAllElements();
         model.setColumnCount(4);
@@ -362,6 +384,7 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_showSeries_buttonActionPerformed
 
     private void showMovies_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showMovies_buttonActionPerformed
+        tableState = "movies";
         DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
         model.getDataVector().removeAllElements();
         model.setColumnCount(4);
@@ -382,13 +405,56 @@ public class index extends javax.swing.JFrame {
         model.setColumnCount(4);
         model.setColumnIdentifiers(new Object[]{"Nombre", "Precio", "Fecha salida", "Años en el aire"});
         for (int i = 0; i < manager.getPlatforms().length; i++) {
-            model.addRow(new Object[]{manager.getPlatforms()[i][0], manager.getPlatforms()[i][1]+" €", manager.getPlatforms()[i][2], manager.getPlatforms()[i][3], manager.getPlatforms()[i][4]+" años"});
+            model.addRow(new Object[]{manager.getPlatforms()[i][0], manager.getPlatforms()[i][1] + " €", manager.getPlatforms()[i][2], manager.getPlatforms()[i][3], manager.getPlatforms()[i][4] + " años"});
         }
     }//GEN-LAST:event_showPlatforms_buttonActionPerformed
 
+    private void mainTableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_mainTableKeyPressed
+
+    }//GEN-LAST:event_mainTableKeyPressed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        manager.disconnection();
+        System.exit(0);
+    }//GEN-LAST:event_formWindowClosed
+
+    private void mainTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainTableMouseClicked
+        System.out.println(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString());
+    }//GEN-LAST:event_mainTableMouseClicked
+
     public void update() {
+        updateTable(tableState);
         component(false);
         component(true);
+    }
+
+    public void updateTable(String state) {
+        if (state.equals("platforms")) {
+            DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
+            model.getDataVector().removeAllElements();
+            model.setColumnCount(5);
+            model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida", "Fecha Finalizacion"});
+            for (int i = 0; i < manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem())).length; i++) {
+                model.addRow(new Object[]{manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem()))[i][0], manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem()))[i][1], manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem()))[i][2], manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem()))[i][3], manager.getSeriesandMovies(String.valueOf(platforma_comboBox_1.getSelectedItem()))[i][4]});
+            }
+        } else if (state.equals("series")) {
+            DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
+            model.getDataVector().removeAllElements();
+            model.setColumnCount(5);
+            model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida", "Fecha Finalizacion"});
+            for (int i = 0; i < manager.getSeries().length; i++) {
+                model.addRow(new Object[]{manager.getSeries()[i][0], manager.getSeries()[i][1], manager.getSeries()[i][2], manager.getSeries()[i][3], manager.getSeries()[i][4]});
+            }
+        } else if (state.equals("movies")) {
+            DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
+            model.getDataVector().removeAllElements();
+            model.setColumnCount(4);
+            model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida"});
+            for (int i = 0; i < manager.getMovies().length; i++) {
+                model.addRow(new Object[]{manager.getMovies()[i][0], manager.getMovies()[i][1], manager.getMovies()[i][2], manager.getMovies()[i][3]});
+            }
+        }
+        
     }
 
     public void component(Boolean state) {
@@ -417,7 +483,7 @@ public class index extends javax.swing.JFrame {
                 platforma_comboBox_1.removeItemAt(i);
                 platforma_comboBox_2.removeItemAt(i);
                 platforma_comboBox_3.removeItemAt(i);
-                
+
             }
         }
     }
