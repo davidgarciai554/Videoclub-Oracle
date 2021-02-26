@@ -5,6 +5,7 @@
  */
 package code;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -16,7 +17,6 @@ public class index extends javax.swing.JFrame {
 
     BBDD_manager manager = new BBDD_manager();
     String tableState = "empty";
-    int platforms = 0;
 
     /**
      * Creates new form index
@@ -69,6 +69,14 @@ public class index extends javax.swing.JFrame {
         accept_addMovie = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
         platforma_comboBox_3 = new javax.swing.JComboBox<>();
+        updateData = new javax.swing.JFrame();
+        jLabel15 = new javax.swing.JLabel();
+        name_update = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
+        director_update = new javax.swing.JTextField();
+        accept_addPlatform1 = new javax.swing.JButton();
+        jLabel19 = new javax.swing.JLabel();
+        platforma_comboBox_4 = new javax.swing.JComboBox<>();
         connect = new javax.swing.JButton();
         disconnect = new javax.swing.JButton();
         platforma_comboBox_1 = new javax.swing.JComboBox<>();
@@ -170,6 +178,29 @@ public class index extends javax.swing.JFrame {
         addMovie_frame.getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 160, 30));
 
         addMovie_frame.getContentPane().add(platforma_comboBox_3, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 140, 140, 30));
+
+        updateData.getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel15.setText("Nombre");
+        updateData.getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 160, 30));
+        updateData.getContentPane().add(name_update, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 140, 30));
+
+        jLabel16.setText("Plataforma");
+        updateData.getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 160, 30));
+        updateData.getContentPane().add(director_update, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 70, 140, 30));
+
+        accept_addPlatform1.setText("Aceptar");
+        accept_addPlatform1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                accept_addPlatform1ActionPerformed(evt);
+            }
+        });
+        updateData.getContentPane().add(accept_addPlatform1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 310, -1));
+
+        jLabel19.setText("Director");
+        updateData.getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 160, 30));
+
+        updateData.getContentPane().add(platforma_comboBox_4, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 140, 30));
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(850, 525));
@@ -326,7 +357,6 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void findByPlatformActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findByPlatformActionPerformed
-        platforms = platforma_comboBox_1.getSelectedIndex();
         tableState = "platforms";
         DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
         model.getDataVector().removeAllElements();
@@ -410,6 +440,12 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_showPlatforms_buttonActionPerformed
 
     private void mainTableKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_mainTableKeyPressed
+        if (tableState.equals("platforms")) {
+            JOptionPane.showMessageDialog(null, "No se pudo añadir la serie revise la fecha", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } else {
+            updateData.setVisible(true);
+            updateData.setSize(400, 300);
+        }
 
     }//GEN-LAST:event_mainTableKeyPressed
 
@@ -419,8 +455,24 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosed
 
     private void mainTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainTableMouseClicked
-        System.out.println(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString());
+        if (!mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString().equals("")) {
+            updateData.setVisible(true);
+            updateData.setSize(400, 250);
+        }
+
     }//GEN-LAST:event_mainTableMouseClicked
+
+    private void accept_addPlatform1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accept_addPlatform1ActionPerformed
+        if (manager.updateSerieOrMovie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString(), name_update.getText(), director_update.getText(), String.valueOf(platforma_comboBox_4.getSelectedItem()))) {
+            name_update.setText("");
+            director_update.setText("");
+            platforma_comboBox_4.setSelectedIndex(0);
+            updateData.setVisible(false);
+        } else {
+            JOptionPane.showMessageDialog(null, "No se pudo actualizar el dato", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_accept_addPlatform1ActionPerformed
 
     public void update() {
         updateTable(tableState);
@@ -440,8 +492,8 @@ public class index extends javax.swing.JFrame {
         } else if (state.equals("series")) {
             DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
             model.getDataVector().removeAllElements();
-            model.setColumnCount(5);
-            model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida", "Fecha Finalizacion"});
+            model.setColumnCount(4);
+            model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida"});
             for (int i = 0; i < manager.getSeries().length; i++) {
                 model.addRow(new Object[]{manager.getSeries()[i][0], manager.getSeries()[i][1], manager.getSeries()[i][2], manager.getSeries()[i][3], manager.getSeries()[i][4]});
             }
@@ -451,10 +503,10 @@ public class index extends javax.swing.JFrame {
             model.setColumnCount(4);
             model.setColumnIdentifiers(new Object[]{"Nombre", "Director", "Plataforma", "Fecha Salida"});
             for (int i = 0; i < manager.getMovies().length; i++) {
-                model.addRow(new Object[]{manager.getMovies()[i][0], manager.getMovies()[i][1], manager.getMovies()[i][2], manager.getMovies()[i][3]});
+                model.addRow(new Object[]{manager.getMovies()[i][0], manager.getMovies()[i][1], manager.getMovies()[i][2], manager.getMovies()[i][3], manager.getMovies()[i][4]});
             }
         }
-        
+
     }
 
     public void component(Boolean state) {
@@ -473,16 +525,19 @@ public class index extends javax.swing.JFrame {
             platforma_comboBox_1.addItem("");
             platforma_comboBox_2.addItem("");
             platforma_comboBox_3.addItem("");
+            platforma_comboBox_4.addItem("");
             for (int i = 0; i < manager.getPlatforms().length; i++) {
                 platforma_comboBox_1.addItem(manager.getPlatforms()[i][0]);
                 platforma_comboBox_2.addItem(manager.getPlatforms()[i][0]);
                 platforma_comboBox_3.addItem(manager.getPlatforms()[i][0]);
+                platforma_comboBox_4.addItem(manager.getPlatforms()[i][0]);
             }
         } else {
             for (int i = platforma_comboBox_1.getItemCount() - 1; i >= 0; i--) {
                 platforma_comboBox_1.removeItemAt(i);
                 platforma_comboBox_2.removeItemAt(i);
                 platforma_comboBox_3.removeItemAt(i);
+                platforma_comboBox_4.removeItemAt(i);
 
             }
         }
@@ -526,6 +581,7 @@ public class index extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton accept_addMovie;
     private javax.swing.JButton accept_addPlatform;
+    private javax.swing.JButton accept_addPlatform1;
     private javax.swing.JButton addMovie_button;
     private javax.swing.JFrame addMovie_frame;
     private javax.swing.JButton addPlatform_button;
@@ -538,6 +594,7 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JTextField date_addSerie;
     private javax.swing.JTextField director_addMovie;
     private javax.swing.JTextField director_addSerie;
+    private javax.swing.JTextField director_update;
     private javax.swing.JButton disconnect;
     private javax.swing.JButton findByPlatform;
     private javax.swing.JTextField id_addMovie;
@@ -550,6 +607,9 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -563,13 +623,16 @@ public class index extends javax.swing.JFrame {
     private javax.swing.JTextField name_addMovie;
     private javax.swing.JTextField name_addPlatform;
     private javax.swing.JTextField name_addSerie;
+    private javax.swing.JTextField name_update;
     private javax.swing.JComboBox<String> platforma_comboBox_1;
     private javax.swing.JComboBox<String> platforma_comboBox_2;
     private javax.swing.JComboBox<String> platforma_comboBox_3;
+    private javax.swing.JComboBox<String> platforma_comboBox_4;
     private javax.swing.JTextField price_addPlatform;
     private javax.swing.JButton restore;
     private javax.swing.JButton showMovies_button;
     private javax.swing.JButton showPlatforms_button;
     private javax.swing.JButton showSeries_button;
+    private javax.swing.JFrame updateData;
     // End of variables declaration//GEN-END:variables
 }

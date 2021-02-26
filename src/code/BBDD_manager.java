@@ -196,6 +196,84 @@ public class BBDD_manager {
             return null;
         }
     }
+    
+    
+        public boolean updateSerieOrMovie(String old_name, String new_name, String new_director, String new_platform) {
+        try {
+            Statement sta;
+            String query = "UPDATE series SET ";
+            // Vamos añadiendo los distintos valores que queremos cambiar con una flag para 
+            // que no nos de un error con la query
+            boolean aux = false;
+            if (!new_name.equals("")) {
+                query += " nombre = '" + new_name + "'";
+                aux = true;
+            }
+            if (!new_director.equals("")) {
+                if (aux) {
+                    query += ",";
+                }
+                query += " director='" + new_director + "' ";
+                aux = true;
+            }
+            if (!new_platform.equals("")) {
+                if (aux) {
+                    query += ",";
+                }
+                query += "plataforma.nombre='" + new_platform + "' ";
+                aux = true;
+            }
+
+            if (aux) {
+                sta = connect.createStatement();
+
+                query += " WHERE nombre like '" + old_name + "'";
+                System.out.println(query);
+                sta.executeUpdate(query);
+                sta.close();
+            }
+            
+            return true;
+        } catch (Exception e) {
+        }
+
+        try {
+            Statement sta;
+            String query = "UPDATE peliculas SET";
+            // Vamos añadiendo los distintos valores que queremos cambiar con una flag para 
+            // que no nos de un error con la query
+            boolean aux = false;
+            if (!new_name.equals("")) {
+                query += " nombre = '" + new_name + "'";
+                aux = true;
+            }
+            if (!new_director.equals("")) {
+                if (aux) {
+                    query += ",";
+                }
+                query += " director='" + new_director + "' ";
+                aux = true;
+            }
+            if (!new_platform.equals("")) {
+                if (aux) {
+                    query += ",";
+                }
+                query += " plataforma.nombre='" + String.valueOf(new_platform) + "' ";
+                aux = true;
+            }
+
+            if (aux) {
+                sta = connect.createStatement();
+
+                query += " WHERE nombre like '" + old_name + "'";
+                sta.executeUpdate(query);
+                sta.close();
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     public void restoreDatabase() {
         Statement sta;
