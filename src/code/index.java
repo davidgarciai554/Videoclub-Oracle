@@ -195,7 +195,7 @@ public class index extends javax.swing.JFrame {
                 accept_addPlatform1ActionPerformed(evt);
             }
         });
-        updateData.getContentPane().add(accept_addPlatform1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 160, 310, -1));
+        updateData.getContentPane().add(accept_addPlatform1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 155, 310, 30));
 
         jLabel19.setText("Director");
         updateData.getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 160, 30));
@@ -430,6 +430,7 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_addMovie_buttonActionPerformed
 
     private void showPlatforms_buttonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showPlatforms_buttonActionPerformed
+        tableState = "platforms";
         DefaultTableModel model = (DefaultTableModel) mainTable.getModel();
         model.getDataVector().removeAllElements();
         model.setColumnCount(4);
@@ -455,7 +456,9 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosed
 
     private void mainTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mainTableMouseClicked
-        if (!mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString().equals("")) {
+        if (tableState == "platforms") {
+            JOptionPane.showMessageDialog(null, "No se pudo actualizar las plataformas", "ERROR", JOptionPane.ERROR_MESSAGE);
+        } else {
             updateData.setVisible(true);
             updateData.setSize(400, 250);
         }
@@ -463,14 +466,29 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_mainTableMouseClicked
 
     private void accept_addPlatform1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accept_addPlatform1ActionPerformed
-        if (manager.updateSerieOrMovie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString(), name_update.getText(), director_update.getText(), String.valueOf(platforma_comboBox_4.getSelectedItem()))) {
-            name_update.setText("");
-            director_update.setText("");
-            platforma_comboBox_4.setSelectedIndex(0);
-            updateData.setVisible(false);
+
+        if (tableState.equals("series")) {
+            if (manager.updateSerie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString(), name_update.getText(), director_update.getText(), String.valueOf(platforma_comboBox_4.getSelectedItem()))) {
+                name_update.setText("");
+                director_update.setText("");
+                platforma_comboBox_4.setSelectedIndex(0);
+                updateData.setVisible(false);
+                update();
+            } else {
+                JOptionPane.showMessageDialog(null, "No se pudo actualizar el dato", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            JOptionPane.showMessageDialog(null, "No se pudo actualizar el dato", "ERROR", JOptionPane.ERROR_MESSAGE);
+            if (manager.updateMovie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString(), name_update.getText(), director_update.getText(), String.valueOf(platforma_comboBox_4.getSelectedItem()))) {
+                name_update.setText("");
+                director_update.setText("");
+                platforma_comboBox_4.setSelectedIndex(0);
+                updateData.setVisible(false);
+                update();
+            } else {
+                JOptionPane.showMessageDialog(null, "No se pudo actualizar el dato", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
         }
+
 
     }//GEN-LAST:event_accept_addPlatform1ActionPerformed
 
@@ -538,10 +556,10 @@ public class index extends javax.swing.JFrame {
                 platforma_comboBox_2.removeItemAt(i);
                 platforma_comboBox_3.removeItemAt(i);
                 platforma_comboBox_4.removeItemAt(i);
-
             }
         }
     }
+    //UPDATE peliculas SET nombre = 'Adios', director='ecd' ,plataforma=(SELECT REF(pt) from plataformas pt WHERE pt.nombre='Disney+') WHERE nombre ='El lobo de Wall Street';
 
     /**
      * @param args the command line arguments

@@ -21,7 +21,7 @@ public class BBDD_manager {
 
     public boolean connection() {
         try {
-            String url = "jdbc:oracle:thin:@192.168.1.44:1521/videoclub";
+            String url = "jdbc:oracle:thin:@localhost:1521/videoclub";
             String user = "sys as sysdba";
             String password = "root";
 
@@ -196,9 +196,8 @@ public class BBDD_manager {
             return null;
         }
     }
-    
-    
-        public boolean updateSerieOrMovie(String old_name, String new_name, String new_director, String new_platform) {
+
+    public boolean updateSerie(String old_name, String new_name, String new_director, String new_platform) {
         try {
             Statement sta;
             String query = "UPDATE series SET ";
@@ -220,26 +219,28 @@ public class BBDD_manager {
                 if (aux) {
                     query += ",";
                 }
-                query += "plataforma.nombre='" + new_platform + "' ";
+                query += "plataforma=(SELECT REF(pt) from plataformas pt WHERE pt.nombre='" + new_platform + "') ";
                 aux = true;
             }
 
             if (aux) {
                 sta = connect.createStatement();
 
-                query += " WHERE nombre like '" + old_name + "'";
+                query += " WHERE nombre= '" + old_name + "'";
                 System.out.println(query);
                 sta.executeUpdate(query);
                 sta.close();
             }
-            
             return true;
         } catch (Exception e) {
-        }
-
-        try {
+            return false;
+        }       
+    }
+    
+      public boolean updateMovie(String old_name, String new_name, String new_director, String new_platform) {
+          try {
             Statement sta;
-            String query = "UPDATE peliculas SET";
+            String query = "UPDATE peliculas SET ";
             // Vamos añadiendo los distintos valores que queremos cambiar con una flag para 
             // que no nos de un error con la query
             boolean aux = false;
@@ -258,14 +259,16 @@ public class BBDD_manager {
                 if (aux) {
                     query += ",";
                 }
-                query += " plataforma.nombre='" + String.valueOf(new_platform) + "' ";
+                query += "plataforma=(SELECT REF(pt) from plataformas pt WHERE pt.nombre='" + String.valueOf(new_platform) + "')";
                 aux = true;
             }
 
             if (aux) {
                 sta = connect.createStatement();
 
-                query += " WHERE nombre like '" + old_name + "'";
+                query += " WHERE nombre='" + old_name + "'";
+                
+                System.out.println(query);
                 sta.executeUpdate(query);
                 sta.close();
             }
@@ -273,7 +276,7 @@ public class BBDD_manager {
         } catch (Exception e) {
             return false;
         }
-    }
+      }
 
     public void restoreDatabase() {
         Statement sta;
@@ -292,7 +295,7 @@ public class BBDD_manager {
                 "CREATE TABLE plataformas OF t_plataforma",
                 "CREATE TABLE peliculas OF t_pelicula",
                 "CREATE TABLE series OF t_serie",
-                "CREATE OR REPLACE TYPE BODY t_plataforma AS \n"
+                "CREATE OR REPLACE TYPE BODY t_plataforma AS\n"
                 + "    MEMBER FUNCTION años_Aire RETURN NUMBER IS\n"
                 + "        d DATE;\n"
                 + "        a NUMBER;\n"
@@ -326,6 +329,7 @@ public class BBDD_manager {
                 sta.executeUpdate(query[i]);
             }
             sta.close();
+            System.out.println("Restablecido");
         } catch (Exception e) {
         }
     }
