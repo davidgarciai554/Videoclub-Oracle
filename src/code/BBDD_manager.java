@@ -21,7 +21,7 @@ public class BBDD_manager {
 
     public boolean connection() {
         try {
-            String url = "jdbc:oracle:thin:@localhost:1521/videoclub";
+            String url = "jdbc:oracle:thin:@192.168.1.44:1521/videoclub";
             String user = "sys as sysdba";
             String password = "root";
 
@@ -273,6 +273,22 @@ public class BBDD_manager {
                 sta.close();
             }
             return true;
+        } catch (Exception e) {
+            return false;
+        }
+      }
+      
+      public boolean findSerie (String nombre){
+        Statement sta;
+        try {
+            sta = connect.createStatement();
+            ResultSet rs = sta.executeQuery("SELECT s.nombre nombre from series s");
+            while (rs.next()) {
+                if(rs.getString("nombre").equals(nombre)){
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             return false;
         }

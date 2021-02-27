@@ -466,8 +466,9 @@ public class index extends javax.swing.JFrame {
     }//GEN-LAST:event_mainTableMouseClicked
 
     private void accept_addPlatform1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_accept_addPlatform1ActionPerformed
-
-        if (tableState.equals("series")) {
+        System.out.println(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString());
+        System.out.println(manager.findSerie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString()));
+        if (manager.findSerie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString())) {
             if (manager.updateSerie(mainTable.getValueAt(mainTable.getSelectedRow(), 0).toString(), name_update.getText(), director_update.getText(), String.valueOf(platforma_comboBox_4.getSelectedItem()))) {
                 name_update.setText("");
                 director_update.setText("");
